@@ -17,7 +17,10 @@ namespace BulkyBook.DataAccess.Repository
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            _db.products.Include("CoverType");
+            //_db.shoppingCarts.AsNoTracking()
+            //_db.shoppingCarts.AsNoTracking().FirstOrDefault
+            //_db.shoppingCarts.AsNoTracking().Where
+            //_db.products.Include("CoverType");
             dbSet = db.Set<T>();
         }
         public void Add(T entity)
@@ -25,34 +28,42 @@ namespace BulkyBook.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null ,string ? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
-            IQueryable <T> Query = dbSet;
-            if (filter!=null)
+            IQueryable<T> Query = dbSet;
+            if (filter != null)
             {
                 Query = Query.Where(filter);
             }
-            if (includeProperties !=null)
+            if (includeProperties != null)
             {
-                foreach(var includeProp in includeProperties.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    Query=Query.Include(includeProp);
+                    Query = Query.Include(includeProp);
                 }
             }
             return Query.ToList();
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = true)
         {
-            IQueryable<T> Query = dbSet;
+            IQueryable<T> Query;
+            if (tracked)
+            {
+                Query = dbSet;
+            }
+            else
+            {
+                Query = dbSet.AsNoTracking();
+            }
             Query = Query.Where(filter);
             if (includeProperties != null)
-			{
-				foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-				{
-					Query = Query.Include(includeProp);
-				}
-			}
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    Query = Query.Include(includeProp);
+                }
+            }
 #pragma warning disable CS8603 // Possible null reference return.
             return Query.FirstOrDefault();
 #pragma warning restore CS8603 // Possible null reference return.

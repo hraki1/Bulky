@@ -1,15 +1,18 @@
 ﻿using BulkyBook.DataAccess.Repository;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
+using BulkyBook.Utility;
 using BullyBook_ECS.Data;
 using BullyBook_ECS.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 
 namespace BullyBook.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [AutoValidateAntiforgeryToken]
+	[Authorize(Roles = SD.Role_Admin)]
+	[AutoValidateAntiforgeryToken]
     public class CoverTypeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
